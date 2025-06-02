@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevKaDose | Motivational Comedian</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    /* Reset styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #1C1C1C;
+      color: #FFFFFF;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .highlight {
+      background: linear-gradient(45deg, #007BFF, #00E6E6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 16px 32px;
+      background: #007BFF;
+      color: #FFFFFF;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      background: #00E6E6;
+      box-shadow: 0 12px 35px rgba(0, 230, 230, 0.4);
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #007BFF 0%, #00E6E6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .skip-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: #FF4C29;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .skip-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(255, 76, 41, 0.4);
+    }
+
+    /* Circle Reveal Effect */
+    .circle-reveal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1C1C1C;
+      pointer-events: none;
+      z-index: 10; /* Above hero section, below navbar */
+      clip-path: circle(0% at 50% 50%);
+      will-change: clip-path;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 20px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #007BFF, #00E6E6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+      border-radius: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(45deg, #007BFF, #00E6E6);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      color: #FFFFFF;
+      cursor: pointer;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px 0;
+      background: radial-gradient(ellipse at center, rgba(0, 123, 255, 0.1) 0%, transparent 50%);
+      position: relative;
+      overflow: hidden;
+      z-index: 0; /* Below circle-reveal */
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+      z-index: -1;
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: #FFFFFF;
+      opacity: 0;
+    }
+
+    .hero-text .subtitle {
+      font-size: 1.4rem;
+      color: #6C757D;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+
+    /* Skeleton Text Animation Styles */
+    .word-container {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 6px 12px;
+      margin: 2px 3px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: padding 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), margin 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .word-container.special {
+      background-color: rgba(0, 230, 230, 0.2);
+    }
+
+    .word-container.special .word {
+      background: linear-gradient(45deg, #FF4C29, #00E6E6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .word {
+      display: inline-block;
+      color: #6C757D;
+      opacity: 0;
+      transform: translateY(20px);
+      position: relative;
+    }
+
+    .word-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 76, 41, 0.2), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .word-container.reveal::before {
+      left: 100%;
+    }
+
+    .hero-image {
+      position: relative;
+      text-align: center;
+    }
+
+    .hero-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      filter: brightness(1.1) contrast(1.1);
+    }
+
+    .floating-elements {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-element {
+      position: absolute;
+      background: linear-gradient(45deg, #FF4C29, #00E6E6);
+      border-radius: 50%;
+      opacity: 0.2;
+      will-change: transform, opacity, scale;
+    }
+
+    .floating-element:nth-child(1) {
+      width: 60px;
+      height: 60px;
+      top: 20%;
+      left: 10%;
+    }
+
+    .floating-element:nth-child(2) {
+      width: 40px;
+      height: 40px;
+      top: 60%;
+      right: 15%;
+    }
+
+    .floating-element:nth-child(3) {
+      width: 80px;
+      height: 80px;
+      bottom: 20%;
+      left: 20%;
+    }
+
+    /* Section Styling */
+    .section {
+      padding: 120px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-title {
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 60px;
+      color: #FFFFFF;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #6C757D;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+      line-height: 1.8;
+    }
+
+    /* Know Me Section */
+    .know-me-section {
+      background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 230, 230, 0.05) 100%);
+      z-index: 5; /* Below circle-reveal, above hero section */
+      position: relative;
+    }
+
+    .know-me-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+    }
+
+    .know-me-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #FFFFFF;
+      margin-bottom: 24px;
+      opacity: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #FF4C29, #00E6E6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .stat-label {
+      color: #6C757D;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    /* Journey Section */
+    .journey-section {
+      position: relative;
+      z-index: 2; /* Ensure above know-me-section */
+    }
+
+    .journey-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+      z-index: -1;
+    }
+
+    .timeline {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(to bottom, #007BFF, #00E6E6);
+      transform: translateX(-50%);
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 80px;
+      position: relative;
+      opacity: 0;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+      text-align: right;
+      padding-right: 60px;
+      margin-right: 50%;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+      text-align: left;
+      padding-left: 60px;
+      margin-left: 50%;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(45deg, #007BFF, #00E6E6);
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+    }
+
+    .timeline-content {
+      width: 45%;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline-year {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #FF4C29;
+      margin-bottom: 16px;
+    }
+
+    .timeline-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #FFFFFF;
+    }
+
+    /* Podcasts Section */
+    .podcasts-section {
+      background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 230, 230, 0.05) 100%);
+      z-index: 2;
+    }
+
+    .podcasts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .podcast-item {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .podcast-item:hover {
+      transform: translateY(-10px) rotate(2deg);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .podcast-item iframe {
+      width: 100%;
+      height: 250px;
+      border: none;
+      border-radius: 15px 15px 0 0;
+    }
+
+    .podcast-caption {
+      padding: 20px;
+      color: #6C757D;
+      font-weight: 500;
+      transition: color 0.5s ease;
+    }
+
+    /* Contact Section */
+    .contact-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+      position: relative;
+      z-index: 2;
+    }
+
+    .contact-info h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #FF4C29;
+    }
+
+    .contact-info p {
+      color: #6C757D;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .social-link:hover {
+      background: rgba(255, 76, 41, 0.1);
+      border-color: #FF4C29;
+      transform: translateY(-3px);
+    }
+
+    .contact-form {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #FFFFFF;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #FF4C29;
+      box-shadow: 0 0 20px rgba(255, 76, 41, 0.2);
+    }
+
+    .form-group textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #6C757D;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 0;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        flex-direction: column;
+        background: rgba(28, 28, 28, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .hero-content,
+      .know-me-content,
+      .contact-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .hero-text {
+        order: 2;
+        text-align: center;
+      }
+
+      .hero-image {
+        order: 1;
+      }
+
+      .timeline::before {
+        left: 30px;
+      }
+
+      .timeline-item:nth-child(odd) .timeline-content,
+      .timeline-item:nth-child(even) .timeline-content {
+        text-align: left;
+        padding-left: 60px;
+        margin: 0;
+        width: calc(100% - 60px);
+      }
+
+      .timeline-dot {
+        left: 30px;
+        transform: translateX(-50%) scale(1);
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .podcasts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+
+      .hero-text .subtitle {
+        font-size: 1.2rem;
+      }
+
+      .word-container {
+        padding: 4px 8px;
+        margin: 1px 2px;
+        border-radius: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .section {
+        padding: 80px 0;
+      }
+
+      .container {
+        padding: 0 15px;
+      }
+
+      .hero-section {
+        padding: 100px 0 60px;
+      }
+
+      .contact-form {
+        padding: 25px;
+      }
+
+      .hero-text .subtitle {
+        font-size: 1rem;
+      }
+
+      .word-container {
+        padding: 3px 6px;
+        margin: 1px 1px;
+        border-radius: 6px;
+      }
+    }
+
+    /* Scroll Progress Bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, #007BFF, #00E6E6);
+      z-index: 9999;
+      transition: width 0.1s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <video class="loading-video" autoplay muted playsinline>
+      <source src="img/Logo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <button class="skip-button" id="skipVideo">Skip</button>
+  </div>
+
+  <!-- Circle Reveal Overlay -->
+  <div class="circle-reveal" id="circleReveal"></div>
+
+  <!-- Main Content -->
+  <div id="mainContent" style="display: none;">
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <div class="logo">
+            <img src="img/Logo.png" alt="">
+          </div>
+          <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#journey">Journey</a></li>
+            <li><a href="#podcasts">Podcasts</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <div class="hamburger" id="hamburger">☰</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="section hero-section" id="home">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+      </div>
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>DevKaDose</h1>
+            <p class="subtitle" id="animatedSubtitle">
+              <span class="word-container"><span class="word">Motivational</span></span>
+              <span class="word-container special"><span class="word">Comedian,</span></span>
+              <span class="word-container"><span class="word">Digital</span></span>
+              <span class="word-container special"><span class="word">Storyteller,</span></span>
+              <span class="word-container"><span class="word">and</span></span>
+              <span class="word-container special"><span class="word">Brand</span></span>
+              <span class="word-container"><span class="word">Humanizer.</span></span>
+              <br>
+              <span class="word-container"><span class="word">Turning</span></span>
+              <span class="word-container"><span class="word">pain</span></span>
+              <span class="word-container"><span class="word">into</span></span>
+              <span class="word-container special"><span class="word">purpose</span></span>
+              <span class="word-container"><span class="word">with</span></span>
+              <span class="word-container"><span class="word">humor</span></span>
+              <span class="word-container"></span>
+              <span class="word-container special"><span class="word">and.</span></span>
+            </p>
+            <a href="#contact" class="cta-button">Connect with Me</a>
+          </div>
+          <div class="hero-image">
+            <img src="img/hero-img.png" alt="DevKaDose" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Know Me Section -->
+    <section class="section know-me-section" id="about">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+      </div>
+      <div class="container">
+        <h2 class="section-title">Know Me</h2>
+        <div class="know-me-content">
+          <div>
+            <p class="know-me-text">
+              I'm DevKaDose — the guy who jumped into a coffin on <span class="highlight">MTV Roadies Season 6</span> and turned it into a career. My viral 2009 audition, with epic hair and bold vibes, didn't win the show but stole hearts and screen time.
+            </p>
+            <p class="know-me-text">
+              That sparked my journey as a <span class="highlight">Motivational Comedian</span>, <span class="highlight">Digital Storyteller</span>, and <span class="highlight">Brand Humanizer</span> I turn pain, awkward moments, and funny failures into growth for people, teams, and businesses.
+            </p>
+            <p class="know-me-text">
+              From 5-minute talks that ignite rooms to content your cousin, boss, or grandma vibes with, my motto is: <span class="highlight">Keep it real. Make it funny. Leave a mark.</span>
+            </p>
+            <a href="#contact" class="cta-button">Dive Into My World</a>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number">500+</span>
+              <span class="stat-label">Performances</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">15+</span>
+              <span class="stat-label">Years Experience</span>
+            </div>
+            <div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Journey Section -->
+    <section class="section journey-section" id="journey">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+      </div>
+      <div class="container">
+        <h2 class="section-title">My Journey</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h3 class="timeline-year">2009: The Roadies Spark</h3>
+              <p class="timeline-text">
+                p>Went viral on a <span class="highlight">MTV Roadies Season 6</span> with a bold coffin stunt, igniting a passion for entertaining and inspiring.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h3 class="timeline-year">2010-2015: Stage Storyteller</h3>
+              <p class="timeline-text">
+                p>Performed at <span class="highlight">200+ events</span>, from college fests to corporate stages, mastering the art of blending humor with heartfelt lessons.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h3 class="timeline-year">2016-2020: Brand Story Weaver</h3>
+              <p class="timeline-text">
+                p>Crafted relatable content for brands, reaching millions by turning raw moments into stories that connect.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <h3 class="timeline-year">2021-Present: Authenticity Advocate</h3>
+              <p class="timeline-text">
+                p>Over <span class="highlight">500 performances</span> and counting, transforming pain into purpose to inspire teams, communities, and brands worldwide.</p>
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 60px;">
+          <a href="#contact" class="cta-button">Let's Connect Together</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Podcasts Section -->
+    <section class="section podcasts-section" id="podcasts">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+      </div>
+      <div class="container">
+        <h2 class="highlight">Podcasts</h2>
+        <p class="section-subtitle">
+          Catch me sharing stories, insights, and laughs on these <span class="highlight">podcasts</span>. From raw moments to inspiring talks, here's where I connect with audiences.</p>
+        <div class="podcasts-grid">
+          <div class="podcast-item">
+            <iframe src="https://www.youtube.com/embed/GmSJ76YUI3o" title="Podcast Appearance on Akhil Kothari's Channel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <div class="podcast-caption">Podcast Appearance on Akhil Kothari's Channel</div>
+          </div>
+          <div class="podcast-item">
+            <iframe src="https://www.youtube.com/embed/XtUFYzY3sW8" title="Podcast on Kunal Agarwal's Channel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <div class="podcast-caption">Podcast on Kunal's Channel</div>
+          </div>
+          <div class="podcast-item">
+            <iframe src="https://www.youtube.com/embed/Kkq5MRHH-Wk" title="Podcast on UNSCRIPTEDME" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <div class="podcast-caption">Podcast on UNSCRIPTEDME</div>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="#contact" class="cta-button">Explore More</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact-section" id="contact">
+      <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div>
+        <div class="floating-element"></div>
+      <div class="container">
+        <h2 class="section-title">Get in Touch</h2>
+        <div class="contact-content">
+          <div class="contact-info">
+            <h3 class="highlight">Connect Something Unforgettable</h3>
+            <p>
+              Want to collaborate, book a talk, or just chat about life's funny moments? I'm always excited to connect with fellow storytellers, brands looking to add authenticity, and anyone ready to turn their challenges into reality. gold.
+            </p>
+            <div class="social-links">
+              <a href="mailto:hello@devs.com" class="social-link">
+                <span>📧</span> Email Me
+              </a>
+              <a href="tel:+91-9876543210"" class="social-link">
+                <span>📞</span> Call Me
+              </a>
+              <a href="#" class="social-link">
+                <span>🎭</span> LinkedIn
+              </a>
+              <a href="#" class="social-link">
+                <span>📸</span> Instagram
+              </span>
+            </div>
+          </div>
+          <form class="contact-form" id="contactForm">
+            <div class="form-group">
+              <input type="text" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+              <input type="email" name="email" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+              <input type="text" name="subject" placeholder="Subject" required>
+            </div>
+            <div class="form-group">
+              <textarea name="message" placeholder="Your Message" required></textarea>
+            </div>
+            <div style="text-align: center;">
+              <button type="submit" class="cta-button">Send Message</button>
+            </div>
+          </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="section" style="padding: 40px 0px; text-align: center; background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 230, 230, 0.05) 100%); border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <div class="container">
+        <p style="color: #6C757D; font-size: 0.9rem;">
+        © 2023 DevKaDose. All rights reserved.
+        </p>
+        <p style="color: #6C757D; font-size: 0.9rem; margin-top: 10px;">
+        <span style="color:#FF4C29;">Colored</span> with ❤️ for storytellers everywhere.
+        </p>
+    </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // GSAP and ScrollTrigger Animation
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Loading Screen
+    const loadingScreen = document.getElementById('loadingScreen');
+    const mainContent = document.getElementById('mainContent');
+    const loadingVideo = document.querySelector('.loading-video');
+    const skipVideo = document.getElementById('skipVideo');
+
+    gsap.from('.know-me-section', {
+    scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+
+        onUpdate: (self) => {
+        const progress = self.progress;
+        const radius = progress * 150; // Adjust max radius
+        document.getElementById('circleReveal').style.clipPath = `circle(${radius}% at 50% 50%)`;
+        },
+
+        onLeave: () => {
+        gsap.to('#circleReveal', {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+            document.getElementById('circleReveal').style.display = 'none';
+            }
+        });
+
+        gsap.to('.know-me-section', {
+            opacity: 1,
+            duration: 0.3
+        });
+        },
+
+        onEnterBack: () => {
+        gsap.to('#circleReveal', {
+            opacity: 1,
+            duration: 0.3,
+            onStart: () => {
+            document.getElementById('circleReveal').style.display = 'block';
+            }
+        });
+
+        gsap.to('.know-me-section', {
+            opacity: 0,
+            duration: 0.3
+        });
+        }
+    }
+    });
+
+
+    function revealContent() {
+      gsap.to(loadingScreen, {
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        onComplete: () => {
+          loadingScreen.style.pointerEvents = 'none';
+          mainContent.style.display = 'block';
+          gsap.fromTo(mainContent, { opacity: 0 }, { opacity: 1, duration: 0.5 });
+          ScrollTrigger.refresh();
+        }
+      });
+    }
+
+    loadingVideo.addEventListener('ended', revealContent);
+
+    loadingVideo.addEventListener('error', () => {
+      console.error('Video failed to load');
+      revealContent();
+    });
+
+    skipVideo.addEventListener('click', () => {
+      loadingVideo.pause();
+      revealContent();
+    });
+
+    // Fallback timeout (10s)
+    setTimeout(revealContent, 10000);
+
+    // Hero Section Animations
+    gsap.fromTo(
+      '.hero-text h1',
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.hero-section',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+
+    // Skeleton Text Animation for Subtitle
+    const skeletonTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top 80%',
+        toggleActions: 'play none none reverse'
+      }
+    });
+    const textTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top 80%',
+        delay: 1
+      }
+    });
+
+    const wordContainers = document.querySelectorAll('.word-container');
+    const words = document.querySelectorAll('.word');
+
+    gsap.set(wordContainers, {
+      scale: 0.8,
+      opacity: 0,
+      rotationX: -15
+    });
+
+    gsap.set(words, {
+      y: 20,
+      opacity: 0,
+      rotationX: 15
+    });
+
+    wordContainers.forEach((container, index) => {
+      skeletonTl.to(container, {
+        scale: 1,
+        opacity: 1,
+        rotationX: 0,
+        duration: 0.6,
+        ease: "back.out(1.2)",
+        onComplete: () => {
+          container.classList.add('reveal');
+        }
+      }, index * 0.1);
+    });
+
+    words.forEach((word, index) => {
+      const container = word.closest('.word-container');
+      textTl.to(word, {
+        y: 0,
+        opacity: 1,
+        rotationX: 0,
+        duration: 0.4,
+        ease: "power2.out"
+      }, index * 0.08)
+      .to(container, {
+        backgroundColor: "transparent",
+        padding: "0px 2px",
+        margin: "0px 1px",
+        duration: 0.6,
+        ease: "power2.out"
+      }, index * 0.08 + 0.2);
+    });
+
+    wordContainers.forEach(container => {
+      container.addEventListener('mouseenter', () => {
+        gsap.to(container, {
+          scale: 1.05,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      });
+
+      container.addEventListener('mouseleave', () => {
+        gsap.to(container, {
+          scale: 1,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      });
+    });
+
+    gsap.to('#animatedSubtitle', {
+      scale: 1.02,
+      duration: 4,
+      ease: "power1.inOut",
+      yoyo: true,
+      repeat: -1
+    });
+
+    // Floating Elements Animation for All Sections
+    document.querySelectorAll('.section .floating-element, footer .floating-element').forEach((element, index) => {
+      const section = element.closest('.section, footer');
+      const timeline = gsap.timeline({ repeat: -1 });
+
+      // Define a function to generate a single float animation segment
+      function createFloatSegment() {
+        const xMove = (Math.random() - 0.5) * 200; // Random x movement (-100 to 100px)
+        const yMove = (Math.random() - 0.5) * 200; // Random y movement (-100 to 100px)
+        const scale = 0.8 + Math.random() * 0.4; // Random scale (0.8 to 1.2)
+        const opacity = 0.1 + Math.random() * 0.2; // Random opacity (0.1 to 0.3)
+        const rotation = (Math.random() - 0.5) * 180; // Random rotation (-90 to 90 degrees)
+        const duration = 4 + Math.random() * 4; // Random duration (4 to 8 seconds)
+
+        return {
+          x: xMove,
+          y: yMove,
+          scale: scale,
+          opacity: opacity,
+          rotation: rotation,
+          duration: duration,
+          ease: 'sine.inOut'
+        };
+      }
+
+      // Chain multiple segments for continuous floating
+      for (let i = 0; i < 4; i++) {
+        timeline.to(element, createFloatSegment());
+      }
+
+      // Add slight delay based on index to stagger animations
+      timeline.seek(index * 0.5);
+
+      // Ensure bubbles stay within section bounds
+      gsap.to(element, {
+        scrollTrigger: {
+          trigger: section,
+          start: 'top bottom',
+          end: 'bottom top',
+          toggleActions: 'play pause resume pause',
+          onUpdate: () => {
+            const rect = element.getBoundingClientRect();
+            const sectionRect = section.getBoundingClientRect();
+            if (rect.top < sectionRect.top || rect.bottom > sectionRect.bottom || rect.left < sectionRect.left || rect.right > sectionRect.right) {
+              gsap.set(element, { x: 0, y: 0 }); // Reset position if out of bounds
+            }
+          }
+        }
+      });
+    });
+
+    // Know Me Section Animations
+    // Animate Section Title
+    gsap.fromTo(
+      '.know-me-section .section-title',
+      { opacity: 0, y: -50 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.know-me-section',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+
+    // Animate Know Me Text Paragraphs
+    document.querySelectorAll('.know-me-text').forEach((text, index) => {
+      gsap.fromTo(
+        text,
+        {
+          opacity: 0,
+          x: -50
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: text,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          },
+          delay: index * 0.2
+        }
+      );
+    });
+
+    // Animate Stats Grid Items
+    document.querySelectorAll('.stat-item').forEach((item, index) => {
+      gsap.fromTo(
+        item,
+        {
+          opacity: 0,
+          y: 20,
+          scale: 0.9
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: 'back.out(1.4)',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          },
+          delay: index * 0.15
+        }
+      );
+
+      // Hover Animation for Stats
+      item.addEventListener('mouseenter', () => {
+        gsap.to(item, {
+          scale: 1.05,
+          boxShadow: '0 15px 30px rgba(0, 123, 255, 0.4)',
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+      });
+
+      item.addEventListener('mouseleave', () => {
+        gsap.to(item, {
+          scale: 1,
+          boxShadow: 'none',
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+      });
+    });
+
+    // Animate CTA Button
+    gsap.fromTo(
+      '.know-me-section .cta-button',
+      {
+        opacity: 0,
+        y: 20
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.know-me-section .cta-button',
+          start: 'top 90%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+
+    // Journey Section Animations
+    document.querySelectorAll('.timeline-item').forEach((item, index) => {
+      const content = item.querySelector('.timeline-content');
+      const dot = item.querySelector('.timeline-dot');
+      const isOdd = index % 2 === 0;
+
+      gsap.fromTo(
+        content,
+        {
+          opacity: 0,
+          x: isOdd ? 100 : -100
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+
+      gsap.fromTo(
+        dot,
+        {
+          scale: 0,
+          opacity: 0
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.5,
+          ease: 'back.out(1.7)',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+
+      gsap.fromTo(
+        item,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.3,
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+
+    // Podcasts Section Animations
+    document.querySelectorAll('.podcast-item').forEach((item, index) => {
+      // Entrance Animation
+      gsap.fromTo(
+        item,
+        {
+          opacity: 0,
+          y: 50
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+            stagger: 0.2 * index
+          }
+      });
+
+      // Complex Color Animation
+      
+
+      gsap.to(item, {
+        backgroundColor: colors[index % colors.length],
+        boxShadow: `0 20px 40px ${colors[index % colors.length].replace('0.2', '0.5')}`,
+        duration: 2,
+        ease: 'sine.inOut',
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 80%',
+          end: 'bottom 20%',
+          scrub: true,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const colorIndex = Math.floor(progress * colors.length) % colors.length;
+            gsap.to(item, {
+              backgroundColor: colors[colorIndex],
+              boxShadow: `0 20px 40px ${colors[colorIndex].replace('0.2', '0.5')}`,
+              duration: 0.5
+            });
+            gsap.to(item.querySelector('.podcast-caption'), {
+              color: textColors[colorIndex],
+              duration: 0.5
+            });
+          }
+        }
+      });
+
+      // Hover Animation
+      item.addEventListener('mouseenter', () => {
+        gsap.to(item, {
+          scale: 1.05,
+          rotation: 2,
+          boxShadow: `0 30px 60px ${colors[index % colors.length].replace('0.2', '0.7')}`,
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+      });
+
+      item.addEventListener('mouseleave', () => {
+        gsap.to(item, {
+          scale: 1,
+          rotation: 0,
+          boxShadow: `0 20px 40px ${colors[index % colors.length].replace('0.2', '0.5')}`,
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+      });
+    });
+
+    // Hamburger Menu
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Scroll Progress Bar
+    window.addEventListener('scroll', () => {
+      const scrollProgress = document.getElementById('scrollProgress');
+      const scrollTop = window.scrollY;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercentage = (scrollTop / scrollHeight) * 100;
+      scrollProgress.style.width = scrollPercentage + '%';
+    });
+
+    // Smooth Scroll for Nav Links
+    document.querySelectorAll('.nav-links a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Close mobile nav if open
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks.classList.contains('active')) {
+          navLinks.classList.remove('active');
+        }
+      });
+    });
+
+    // Contact Form Submission
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Form submitted! (This is a demo - form functionality not implemented)');
+      contactForm.reset();
+    });
+  </script>
+</body>
+</html>
